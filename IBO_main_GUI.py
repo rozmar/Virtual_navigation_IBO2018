@@ -162,16 +162,16 @@ class IBO_runnungrat_GUI():
         self.neurons=neurons
         self.trajectories=trajectories
         self.exp1_handles=dict()
-        self.exp1_handles['w']=500
-        self.exp1_handles['h']=500
-        figsize_big=(10, 10)
+        self.exp1_handles['w']=550
+        self.exp1_handles['h']=550
+        figsize_big=(11, 11)
         dpi_big=60
-        rect_big=[0.05, 0.2, .75, .75]
-        self.exp1_handles['w_small']=300
-        self.exp1_handles['h_small']=150
-        smallfigsize=(4,2.2)
+        rect_big=[0.07, 0.22, .75, .75]
+        self.exp1_handles['w_small']=320
+        self.exp1_handles['h_small']=180
+        smallfigsize=(4.2,2.8)
         smalldpi=60
-        smallrect=[.15,.15, .8, .8]
+        smallrect=[.22,.20, .75, .65]
         
         
         self.exp1_handles['window'] = master
@@ -239,6 +239,8 @@ class IBO_runnungrat_GUI():
         self.exp1_handles['ax1'] = self.exp1_handles['fig1'].add_axes(rect_big)
         self.exp1_handles['ax1'].set_xlim(0,200)
         self.exp1_handles['ax1'].set_ylim(0,200)
+        self.exp1_handles['ax1'].set_xlabel('X side (cm)')
+        self.exp1_handles['ax1'].set_ylabel('Y side (cm)')
         self.exp1_handles['line'] =self.exp1_handles['ax1'].plot(0, 0,linewidth=3,zorder = 1)
         self.exp1_handles['dots_small'] =self.exp1_handles['ax1'].scatter(100,100,edgecolors='k',facecolor='r',linewidths=1,s=20,zorder = 2)
         self.exp1_handles['dots_big'] =self.exp1_handles['ax1'].scatter(50,50,edgecolors='k',facecolor='r',linewidths=1,s=150,zorder = 3)
@@ -254,6 +256,8 @@ class IBO_runnungrat_GUI():
         self.exp1_handles['ax2'] = self.exp1_handles['fig2'].add_axes(smallrect)
         self.exp1_handles['ax2'].set_xlim(0,200)
         self.exp1_handles['ax2'].set_ylim(0,200)
+        self.exp1_handles['ax2'].set_xlabel('X location (cm)')
+        self.exp1_handles['ax2'].set_ylabel('Average\nfiring frequency (Hz)')
         #self.exp1_handles['ax2_hist'] =self.exp1_handles['ax2'].plot(0, 0,linewidth=3)
         self.exp1_handles['ax2_hist'] =self.exp1_handles['ax2'].bar(0, 0)
         self.exp1_handles['ax2_line'] =self.exp1_handles['ax2'].plot(0, 0,linewidth=5,color='black')
@@ -265,6 +269,8 @@ class IBO_runnungrat_GUI():
         self.exp1_handles['ax3'] = self.exp1_handles['fig3'].add_axes(smallrect)
         self.exp1_handles['ax3'].set_xlim(0,200)
         self.exp1_handles['ax3'].set_ylim(0,200)
+        self.exp1_handles['ax3'].set_xlabel('Y location (cm)')
+        self.exp1_handles['ax3'].set_ylabel('Average\nfiring frequency (Hz)')
         #self.exp1_handles['ax3_hist'] =self.exp1_handles['ax3'].plot(0, 0,linewidth=3)
         self.exp1_handles['ax3_hist'] =self.exp1_handles['ax3'].bar(0, 0)
         self.exp1_handles['ax3_line'] =self.exp1_handles['ax3'].plot(0, 0,linewidth=5,color='black')
@@ -276,6 +282,8 @@ class IBO_runnungrat_GUI():
         self.exp1_handles['ax4'] = self.exp1_handles['fig4'].add_axes(smallrect)
         self.exp1_handles['ax4'].set_xlim(0,70)
         self.exp1_handles['ax4'].set_ylim(0,70)
+        self.exp1_handles['ax4'].set_xlabel('Speed (cm/s)')
+        self.exp1_handles['ax4'].set_ylabel('Average\nfiring frequency (Hz)')
         #self.exp1_handles['ax4_hist'] =self.exp1_handles['ax4'].plot(0, 0,linewidth=3)
         self.exp1_handles['ax4_hist'] =self.exp1_handles['ax4'].bar(0, 0)
         self.exp1_handles['ax4_line'] =self.exp1_handles['ax4'].plot(0, 0,linewidth=5,color='black')
@@ -287,13 +295,15 @@ class IBO_runnungrat_GUI():
         self.exp1_handles['ax5'] = self.exp1_handles['fig5'].add_axes(smallrect, projection = 'polar')
         self.exp1_handles['ax5'].set_theta_zero_location("W")
         self.exp1_handles['ax5'].set_rmin(0)
+        #self.exp1_handles['ax5'].set_title('Head direction '+u'\N{DEGREE SIGN}')
         self.exp1_handles['ax5_polar'] =self.exp1_handles['ax5'].plot(0, 0,color='black')
+        self.exp1_handles['ax5_polar_bar'] =self.exp1_handles['ax5'].bar(0, 0,color='black')
         self.exp1_handles['ax5_direction'] =self.exp1_handles['ax5'].plot(0, 1,color='black')
         self.exp1_handles['fig_photo_ax5'] = self.draw_figure(self.exp1_handles['canvas5'], self.exp1_handles['fig5'], loc=(0, 0))
         
         self.steppingrat()
         tk.Label(self.exp1_handles['window'],text = '       ').grid(row=0, column=6)
-    
+        tk.Label(self.exp1_handles['window'],text = 'Head direction '+u'\N{DEGREE SIGN}').grid(row=4, column=7,rowspan=1,columnspan=2,sticky='S')
     def draw_figure(self, canvas, figure, loc=(0, 0)):
         """ Draw a matplotlib figure onto a Tk canvas
     
