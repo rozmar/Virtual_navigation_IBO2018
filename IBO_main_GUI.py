@@ -1,21 +1,26 @@
+import os
+import json
 import IBO_main
 import numpy as np
 import tkinter as tk
 import tkinter.messagebox as messagebox
+from tkinter import simpledialog
 import matplotlib as mpl
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 #from multiprocessing import Process
 import time
-neurons, trajectories = IBO_main.loadthedata()
+neurons, trajectories, basedir = IBO_main.loadthedata()
 
 
 #%%
 class IBO_mainwindow:
-    def __init__(self,master,neurons,trajectories):
+    def __init__(self,master,neurons,trajectories,basedir):
         self.master=master
         self.neurons=neurons
         self.trajectories=trajectories
+        self.basedir=basedir
+        self.logdir=basedir + '/Logs/'
         self.ID = tk.StringVar()
         self.answer_cellgroups = [False, False, False, False]
         self.answer_1 = tk.StringVar()
@@ -57,7 +62,7 @@ class IBO_mainwindow:
         self.skip_exp_1_button.grid(row=9, column=0,columnspan=8)
         self.exp1_startbutton_2 = tk.Button(master, text = 'Start\nexperiment\nagain!',command = self.startexperiment_2, state='disabled')
         self.exp1_startbutton_2.grid(row=10,column=0,columnspan=8)
-        
+        self.exp1_disabled = False
     def validate_answer(self, P):
         if (str.isdigit(P) and float(P)<=len(self.neurons) and float(P)>0) or P == "":
             return True
@@ -106,12 +111,14 @@ class IBO_mainwindow:
             self.update_answer_counter()
             if self.unusedanswers.get()<1 or self.answer_cellgroups.count(True) == 4:
                 self.disable_exp1()
+            self.updatelog()
                     
     def skip_exp1(self):
         answer = messagebox.askyesno('!!WARNING!!','Are you sure? Do you really want to skip this task? You will lose your remaining chances and there is no way back!')
         if answer:
             self.disable_exp1()
-    def disable_exp1(self):       
+    def disable_exp1(self):   
+        self.exp1_disabled = True
         self.exp1_startbutton.config(state='disabled')
         self.answer_1_entry.config(state='disabled')
         self.answer_2_entry.config(state='disabled')
@@ -124,22 +131,80 @@ class IBO_mainwindow:
         self.cellgroup_label_4.config(state='disabled')
         self.skip_exp_1_button.config(state='disabled')
         self.exp1_startbutton_2.config(state='normal')
+        self.updatelog()
     def checkID(self):
         
-#        print(self.ID.get())
-        self.IDentry.config(state='disabled')
-        self.IDsubmit.config(state='disabled')
-        self.exp1_startbutton.config(state='normal')
-        self.answer_1_entry.config(state='normal')
-        self.answer_2_entry.config(state='normal')
-        self.answer_3_entry.config(state='normal')
-        self.answer_submit.config(state='normal')
-        self.unusedanswercounter.config(state='normal')
-        self.cellgroup_label_1.config(state='normal')
-        self.cellgroup_label_2.config(state='normal')
-        self.cellgroup_label_3.config(state='normal')
-        self.cellgroup_label_4.config(state='normal')
-        self.skip_exp_1_button.config(state='normal')
+        logfiles=os.listdir(self.logdir)
+        ID=self.ID.get().lower()
+        isfilepresent = logfiles.count(ID + '.json')
+        canproceed = False
+        if len(ID)>3:
+            if isfilepresent == 1:
+                answer = simpledialog.askstring("Password needed to load the data.", "Enter password:")
+                if answer == 'mehet':
+                    canproceed = True
+            else:
+                canproceed = True
+        if canproceed:
+            self.IDentry.config(state='disabled')
+            self.IDsubmit.config(state='disabled')
+            self.exp1_startbutton.config(state='normal')
+            self.answer_1_entry.config(state='normal')
+            self.answer_2_entry.config(state='normal')
+            self.answer_3_entry.config(state='normal')
+            self.answer_submit.config(state='normal')
+            self.unusedanswercounter.config(state='normal')
+            self.cellgroup_label_1.config(state='normal')
+            self.cellgroup_label_2.config(state='normal')
+            self.cellgroup_label_3.config(state='normal')
+            self.cellgroup_label_4.config(state='normal')
+            self.skip_exp_1_button.config(state='normal')
+            if isfilepresent == 1: # loading the data and updating the GUI
+                with open(self.logdir + ID + '.json', 'r') as f_obj: storeddata = json.load(f_obj)
+                self.unusedanswers.set(storeddata['unusedanswers'])
+                self.ID.set(storeddata['ID'])
+                self.answer_cellgroups = storeddata['answer_cellgroups']
+                self.exp1_disabled = storeddata['exp1_disabled']
+                if self.answer_cellgroups[0] == True:
+                    self.cellgroup_label_1.config(text = 'Group 1 - speed modulated cells' )
+                if self.answer_cellgroups[1] == True:
+                    self.cellgroup_label_1.config(text = 'Group 2 - head direction cells' )
+                if self.answer_cellgroups[2] == True:
+                    self.cellgroup_label_1.config(text = 'Group 3 - border cells' )
+                if self.answer_cellgroups[3] == True:
+                    self.cellgroup_label_1.config(text = 'Group 4 - grid cells' )
+                self.update_answer_counter()
+                if self.exp1_disabled == True:
+                    self.disable_exp1()
+            else:
+                self.updatelog()
+                #generating json file
+    def updatelog(self):
+        ID=self.ID.get().lower()
+        datatostore = dict()
+        datatostore['unusedanswers'] = self.unusedanswers.get()
+        datatostore['ID'] = ID
+        datatostore['answer_cellgroups'] = self.answer_cellgroups
+        datatostore['exp1_disabled'] = self.exp1_disabled
+        with open(self.logdir + ID + '.json', 'w') as f_obj: json.dump(datatostore, f_obj)
+        
+        cellnums=list()
+        cellnums.append(self.answer_1.get())
+        cellnums.append(self.answer_2.get())
+        cellnums.append(self.answer_3.get())
+        cellnums_str=str()
+        answer_str=str()
+        for cellnum in cellnums:
+            cellnums_str += str(cellnum) + ', '
+        for answer in self.answer_cellgroups:
+            answer_str += str(answer) + ', '
+        with open(self.logdir + ID + '.log', 'a') as file_object:
+            file_object.write(time.strftime('%Y.%m.%d. - %H:%M:%S'))
+            file_object.write('   selected cells: ' + cellnums_str)
+            file_object.write('   answers so far: ' + answer_str)
+            file_object.write('   tries left: ' + str(self.unusedanswers.get()))
+            file_object.write('   exp1 disabled: ' + str(self.exp1_disabled) + '\n')
+            
         
     def startexperiment(self):
         neurons[0].smalldots = 60
@@ -416,7 +481,9 @@ class IBO_runnungrat_GUI():
         maxval=np.nanmax(yvals)
         if maxval==np.nan or maxval==0:
             maxval=1
-        self.exp1_handles['ax5_polar'][0].set_data(xvals,yvals)
+        #self.exp1_handles['ax5_polar'][0].set_data(xvals,yvals)
+        self.exp1_handles['ax5_polar_bar'].remove()
+        self.exp1_handles['ax5_polar_bar'] =self.exp1_handles['ax5'].bar(xvals,yvals,.25,color='blue')
         self.exp1_handles['ax5'].set_rmax(maxval)
         
         if neurons[0].timenow == 10**10:
@@ -501,5 +568,5 @@ class IBO_runnungrat_GUI():
 
 root = tk.Tk()
 root.title('Virtual navigation')
-app = IBO_mainwindow(root,neurons, trajectories)
+app = IBO_mainwindow(root,neurons, trajectories, basedir)
 root.mainloop()

@@ -286,4 +286,4 @@ def loadthedata():
         trajectories.append(RatTrajectory(data))
         
     
-    return neurons, trajectories
+    return neurons, trajectories, basedir
