@@ -30,7 +30,7 @@ class IBO_mainwindow:
         self.IDlabel.grid(row=0, column=0,sticky = 'E')
         self.IDentry = tk.Entry(master,textvariable = self.ID,width = 10)
         self.IDentry.grid(row=0, column=1,columnspan=3)
-        self.IDsubmit = tk.Button(master,text = 'Submit \nname!',command=self.checkID)
+        self.IDsubmit = tk.Button(master,text = 'Submit \nID!',command=self.checkID)
         self.IDsubmit.grid(row=0,column=7)
         
         self.exp1_startbutton = tk.Button(master, text = 'Start \nexperiment!',command = self.startexperiment, state='disabled')
@@ -136,6 +136,7 @@ class IBO_mainwindow:
         
         logfiles=os.listdir(self.logdir)
         ID=self.ID.get().lower()
+        self.ID.set(ID)
         isfilepresent = logfiles.count(ID + '.json')
         canproceed = False
         if len(ID)>3:
