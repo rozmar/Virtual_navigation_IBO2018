@@ -1,6 +1,7 @@
 import os
 from scipy.io import loadmat
 import numpy as np
+import random
 
 def loadthedata():
     basedir=os.path.dirname(__file__)
@@ -34,7 +35,7 @@ def loadthedata():
     inhibitedcell_firingratechange_mu = 20
     inhibitedcell_firingratechange_sigma = 5
     bulkcellnum = 5
-    APtime_maxrandvalue = .0002 # to randomize the timing of the APs
+    APtime_maxrandvalue = .0005 # to randomize the timing of the APs
     
     celltypes=list()
     for celli in range(0,excitedcellnum):
@@ -76,7 +77,8 @@ def loadthedata():
         
         for timenow in np.linspace(timestart,timeend,binnum):
             idx += 1
-            sweepnums = np.random.uniform(1,sweepnum,aphist[idx]).round()
+#            sweepnums = np.random.uniform(1,sweepnum,aphist[idx]).round()
+            sweepnums= random.sample(range(1,sweepnum),aphist[idx])
             times = np.ones(aphist[idx]) * timenow
             apsweep.extend(sweepnums)
             aptime.extend(times)
