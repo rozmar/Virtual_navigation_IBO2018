@@ -91,21 +91,21 @@ class IBO_mainwindow:
                         messagebox.showinfo("Hey!", "You have found the head direction cells... again.. look for something else!")
                     else:
                         self.answer_cellgroups[1] = True
-                        self.cellgroup_label_1.config(text = 'Group 2 - head direction cells' )
+                        self.cellgroup_label_2.config(text = 'Group 2 - head direction cells' )
                         messagebox.showinfo("Congratulations!", "You have found the head direction cells!")
                 elif celltypes[0] == 'border':
                     if self.answer_cellgroups[2] == True:
                         messagebox.showinfo("Hey!", "You have found the border cells... again.. look for something else!")
                     else:
                         self.answer_cellgroups[2] = True
-                        self.cellgroup_label_1.config(text = 'Group 3 - border cells' )
+                        self.cellgroup_label_3.config(text = 'Group 3 - border cells' )
                         messagebox.showinfo("Congratulations!", "You have found the border cells!")
                 elif celltypes[0] == 'grid':
                     if self.answer_cellgroups[3] == True:
                         messagebox.showinfo("Hey!", "You have found the grid cells... again.. look for something else!")
                     else:
                         self.answer_cellgroups[3] = True
-                        self.cellgroup_label_1.config(text = 'Group 4 - grid cells' )
+                        self.cellgroup_label_4.config(text = 'Group 4 - grid cells' )
                         messagebox.showinfo("Congratulations!", "You have found the grid cells!")
             self.unusedanswers.set(self.unusedanswers.get()-1)
             self.update_answer_counter()
@@ -211,20 +211,20 @@ class IBO_mainwindow:
         neurons[0].smalldots = 60
         trajectories[0].timeback = 60
         self.newWindow = tk.Toplevel(self.master)
-        self.app = IBO_runnungrat_GUI(self.newWindow,self.neurons,self.trajectories)
+        self.app = IBO_runnungrat_GUI(self.newWindow,self.neurons,self.trajectories,False)
     
     def startexperiment_2(self):
         neurons[0].smalldots = np.inf
         trajectories[0].timeback = np.inf
         self.newWindow = tk.Toplevel(self.master)
-        self.app = IBO_runnungrat_GUI(self.newWindow,self.neurons,self.trajectories)
+        self.app = IBO_runnungrat_GUI(self.newWindow,self.neurons,self.trajectories,True)
     
     def update_answer_counter(self):
         self.unusedanswercounter.config(text = 'You have\n' + str(self.unusedanswers.get()) + '\ntries left.')
         
         
 class IBO_runnungrat_GUI():
-    def __init__(self, master,neurons,trajectories):
+    def __init__(self, master,neurons,trajectories,disableplay):
         self.neurons=neurons
         self.trajectories=trajectories
         self.exp1_handles=dict()
@@ -286,6 +286,9 @@ class IBO_runnungrat_GUI():
         self.exp1_handles['PlayButton'] = tk.Button(self.exp1_handles['window'], text ="Play", command = self.start_stop_runningrat )
         #self.exp1_handles['PlayButton'].pack()
         self.exp1_handles['PlayButton'].grid(row=7,column=1, sticky='W')
+        
+        if disableplay:
+            self.exp1_handles['PlayButton'].config(state='disabled')
         
         self.exp1_handles['SlowDownButton'] = tk.Button(self.exp1_handles['window'], text ="Slow down", command = self.slowdowntherun )
         #self.exp1_handles['PlayButton'].pack()

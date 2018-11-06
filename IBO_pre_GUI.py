@@ -4,10 +4,9 @@ import tkinter.messagebox as messagebox
 import matplotlib as mpl
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-#from multiprocessing import Process
-import time
-#neurons, trajectories, basedir = IBO_main.loadthedata()
-neurons=list(range(1,10));
+import IBO_pre
+
+neurons = IBO_pre.loadthedata()
 
 #%%
 class IBO_pre_mainwindow:
@@ -37,9 +36,9 @@ class IBO_pre_mainwindow:
         self.unusedanswercounter = tk.Label(master, text = '')
         self.unusedanswercounter.grid(row=4, column=1,columnspan=3)
         self.update_answer_counter()
-        self.cellgroup_label_1 = tk.Label(master, text = 'Group 1 - ???', state = 'disabled')
+        self.cellgroup_label_1 = tk.Label(master, text = 'Group 1 - ???')
         self.cellgroup_label_1.grid(row=5, column=0,columnspan=8)
-        self.cellgroup_label_2 = tk.Label(master, text = 'Group 2 - ???', state = 'disabled')
+        self.cellgroup_label_2 = tk.Label(master, text = 'Group 2 - ???')
         self.cellgroup_label_2.grid(row=6, column=0,columnspan=8)
         
     def validate_answer(self, P):
@@ -56,41 +55,26 @@ class IBO_pre_mainwindow:
         if cellnums[0].isdigit and cellnums[1].isdigit and cellnums[2].isdigit and cellnums.count(cellnums[0])==1 and cellnums.count(cellnums[1]) == 1 and cellnums.count(cellnums[2]) == 1:
             celltypes = list()
             for num in cellnums:
-                celltypes.append(neurons[int(num)-1].data[neurons[int(num)-1].runnum]['celltype'])
+                celltypes.append(neurons[int(num)-1]['celltype'])
+            print(celltypes)
             if celltypes.count(celltypes[0]) == len(celltypes) and celltypes[0] != 'bulk':
-                if celltypes[0] == 'speed':
+                if celltypes[0] == 'excited':
                     if self.answer_cellgroups[0] == True:
-                        messagebox.showinfo("Hey!", "You have found the speed modulated neurons... again.. look for something else!")
+                        messagebox.showinfo("Hey!", "You have found the excited neurons... again.. look for something else!")
                     else:
                         self.answer_cellgroups[0] = True
-                        self.cellgroup_label_1.config(text = 'Group 1 - speed modulated cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the speed modulated neurons!")
-                elif celltypes[0] == 'HD':
+                        self.cellgroup_label_1.config(text = 'Group 1 - excited neurons' )
+                        messagebox.showinfo("Congratulations!", "You have found the excited neurons!")
+                elif celltypes[0] == 'inhibited':
                     if self.answer_cellgroups[1] == True:
-                        messagebox.showinfo("Hey!", "You have found the head direction cells... again.. look for something else!")
+                        messagebox.showinfo("Hey!", "You have found the inhibited cells... again.. look for something else!")
                     else:
                         self.answer_cellgroups[1] = True
-                        self.cellgroup_label_1.config(text = 'Group 2 - head direction cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the head direction cells!")
-                elif celltypes[0] == 'border':
-                    if self.answer_cellgroups[2] == True:
-                        messagebox.showinfo("Hey!", "You have found the border cells... again.. look for something else!")
-                    else:
-                        self.answer_cellgroups[2] = True
-                        self.cellgroup_label_1.config(text = 'Group 3 - border cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the border cells!")
-                elif celltypes[0] == 'grid':
-                    if self.answer_cellgroups[3] == True:
-                        messagebox.showinfo("Hey!", "You have found the grid cells... again.. look for something else!")
-                    else:
-                        self.answer_cellgroups[3] = True
-                        self.cellgroup_label_1.config(text = 'Group 4 - grid cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the grid cells!")
+                        self.cellgroup_label_2.config(text = 'Group 2 - inhibited neurons' )
+                        messagebox.showinfo("Congratulations!", "You have found the inhibited cells!")
             self.unusedanswers.set(self.unusedanswers.get()-1)
             self.update_answer_counter()
-            if self.unusedanswers.get()<1 or self.answer_cellgroups.count(True) == 4:
-                self.disable_exp1()
-            self.updatelog()
+            
                     
     def startexperiment(self):
         self.newWindow = tk.Toplevel(self.master)
@@ -103,6 +87,8 @@ class IBO_touchtherat_GUI():
     def __init__(self, master,neurons):
         self.neurons=neurons
         dpi=60
+        self.sweepend = 100
+        self.sweepstart = -50
         self.exp1_handles=dict()
         self.exp1_handles['trace_w']=1000
         self.exp1_handles['trace_h']=120
@@ -130,7 +116,7 @@ class IBO_touchtherat_GUI():
         self.exp1_handles['cellnum'].set(1)
 
         self.exp1_handles['replayspeed'] = 1 
-        self.exp1_handles['replayinterval_base'] = 0.05
+        self.exp1_handles['replayinterval_base'] = 1
         self.exp1_handles['steptime'] = [np.nan, np.nan, np.nan, np.nan, np.nan]
         
         
@@ -141,7 +127,7 @@ class IBO_touchtherat_GUI():
         self.exp1_handles['cellselector'] = tk.OptionMenu(self.exp1_handles['window'], self.exp1_handles['cellnum'], *list(range(1, len(self.neurons)+1)), command=self.stimulate ) 
         self.exp1_handles['cellselector'].grid(row=0, column=1, sticky='W')
         
-        self.exp1_handles['TimeScale'] = tk.Scale(self.exp1_handles['window'], orient = 'horizontal', length = 1000, variable = self.exp1_handles['timenow'], from_ = 0, to = 1000, command = self.stimulate_once)
+        self.exp1_handles['TimeScale'] = tk.Scale(self.exp1_handles['window'], orient = 'horizontal', length = 1000, variable = self.exp1_handles['timenow'], from_ = 1, to = 1000, command = self.stimulate_once)
         #self.exp1_handles['TimeScale'].pack()
         self.exp1_handles['TimeScale'].grid(row=8,column=1, sticky='W',columnspan = 5)
         tk.Label(self.exp1_handles['window'],text = 'Stimulus number').grid(row=9,column=1,columnspan = 5)
@@ -165,30 +151,34 @@ class IBO_touchtherat_GUI():
         self.exp1_handles['trace_canvas'].grid(row=2, column=1,columnspan=5,rowspan=1)
         self.exp1_handles['trace_fig'] = mpl.figure.Figure(figsize=figsize_trace,dpi=dpi)
         self.exp1_handles['trace_ax'] = self.exp1_handles['trace_fig'].add_axes(rect_trace)
-        self.exp1_handles['trace_ax'].set_xlim(-50,150)
-        self.exp1_handles['trace_ax'].set_ylim(-100,100)
+        self.exp1_handles['trace_ax'].set_xlim(self.sweepstart,self.sweepend)
+        self.exp1_handles['trace_ax'].set_ylim(-1,5)
         self.exp1_handles['trace_ax'].set_xlabel('Time relative to touch (ms)')
-        self.exp1_handles['trace_ax'].set_ylabel('Voltage (\microV)')
+        self.exp1_handles['trace_ax'].set_ylabel('Voltage (mV)')
+        self.exp1_handles['trace_line'] =self.exp1_handles['trace_ax'].plot(0, 0,linewidth=3,zorder = 1)
+        self.exp1_handles['trace_arrow'] = self.exp1_handles['trace_ax'].arrow(0,5,0,-1,width=1)
         self.exp1_handles['trace_fig_photo'] = self.draw_figure(self.exp1_handles['trace_canvas'], self.exp1_handles['trace_fig'], loc=(0, 0))
         
         self.exp1_handles['dots_canvas'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['dots_w'], height=self.exp1_handles['dots_h'])
         self.exp1_handles['dots_canvas'].grid(row=3, column=1,columnspan=5,rowspan=1)
         self.exp1_handles['dots_fig'] = mpl.figure.Figure(figsize=figsize_dots,dpi=dpi)
         self.exp1_handles['dots_ax'] = self.exp1_handles['dots_fig'].add_axes(rect_dots)
-        self.exp1_handles['dots_ax'].set_xlim(-50,150)
+        self.exp1_handles['dots_ax'].set_xlim(self.sweepstart,self.sweepend)
         self.exp1_handles['dots_ax'].set_ylim(0,1000)
         self.exp1_handles['dots_ax'].set_xlabel('Time relative to touch (ms)')
         self.exp1_handles['dots_ax'].set_ylabel('Trial number')
+        self.exp1_handles['dots_plot'] = self.exp1_handles['dots_ax'].scatter(-100,-50,edgecolors='k',facecolor='r',linewidths=1,s=150,zorder = 3)
         self.exp1_handles['dots_fig_photo'] = self.draw_figure(self.exp1_handles['dots_canvas'], self.exp1_handles['dots_fig'], loc=(0, 0))
         
         self.exp1_handles['hist_canvas'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['hist_w'], height=self.exp1_handles['hist_h'])
         self.exp1_handles['hist_canvas'].grid(row=4, column=1,columnspan=5,rowspan=1)
         self.exp1_handles['hist_fig'] = mpl.figure.Figure(figsize=figsize_hist,dpi=dpi)
         self.exp1_handles['hist_ax'] = self.exp1_handles['hist_fig'].add_axes(rect_hist)
-        self.exp1_handles['hist_ax'].set_xlim(-50,150)
+        self.exp1_handles['hist_ax'].set_xlim(self.sweepstart,self.sweepend)
         self.exp1_handles['hist_ax'].set_ylim(0,100)
         self.exp1_handles['hist_ax'].set_xlabel('Time relative to touch (ms)')
         self.exp1_handles['hist_ax'].set_ylabel('AP number')
+        self.exp1_handles['hist_plot'] =self.exp1_handles['hist_ax'].bar(0, 0)
         self.exp1_handles['hist_fig_photo'] = self.draw_figure(self.exp1_handles['hist_canvas'], self.exp1_handles['hist_fig'], loc=(0, 0))
         
     def draw_figure(self, canvas, figure, loc=(0, 0)):
@@ -211,12 +201,66 @@ class IBO_touchtherat_GUI():
         # Return a handle which contains a reference to the photo object
         # which must be kept live or else the picture disappears
         return photo    
+    def update_plots(self):
+        cellnum = self.exp1_handles['cellnum'].get() - 1
+        sweepnum = self.exp1_handles['timenow'].get()
+        si = self.neurons[cellnum]['si']
+
+        sweepidxes = [i for i, x in enumerate(self.neurons[cellnum]['APsweep']) if x == sweepnum]
+        if len(sweepidxes) > 0:
+            apidxes = [int((self.neurons[cellnum]['APtime'][i] - self.sweepstart/1000)/si) for i in sweepidxes]
+        else:
+            apidxes=list()
+        
+        sweeplength= (self.sweepend - self.sweepstart) / si / 1000
+        sweeptime = np.linspace(self.sweepstart,self.sweepend,sweeplength)
+        y = sweeptime * 0
+        for i in apidxes: y[i-1]=1
+        y=np.convolve(y,self.neurons[cellnum]['APwaveform'],mode='same')
+        y += np.random.normal(0,.1,len(y))
+        self.exp1_handles['trace_line'][0].set_data(sweeptime,y)
+        #self.exp1_handles['trace_ax'].set_ylim(min(self.neurons[cellnum]['APwaveform'])*2,max(self.neurons[cellnum]['APwaveform'])*2)
+        self.exp1_handles['trace_fig_photo'] = self.draw_figure(self.exp1_handles['trace_canvas'], self.exp1_handles['trace_fig'], loc=(0, 0))
+        
+        self.exp1_handles['dots_plot'].set_offsets(np.c_[[i * 1000 for i in self.neurons[cellnum]['APtime']],self.neurons[cellnum]['APsweep']])
+        self.exp1_handles['dots_ax'].set_ylim(0.5,sweepnum+.5)
+        self.exp1_handles['dots_fig_photo'] = self.draw_figure(self.exp1_handles['dots_canvas'], self.exp1_handles['dots_fig'], loc=(0, 0))
+        
+        idxes = [i for i, x in enumerate(self.neurons[cellnum]['APsweep']) if x <= sweepnum]
+        aptimes = [self.neurons[cellnum]['APtime'][x]*1000 for i,x in enumerate(idxes)]
+        if len(aptimes)>0:
+            hist_vals,bin_edges = np.histogram(aptimes,bins='fd')
+            bin_centers= (bin_edges[:-1] + bin_edges[1:]) / 2
+            binwidth = (bin_edges[2] - bin_edges[1])
+        else:
+            hist_vals=0
+            bin_centers=0
+            binwidth=0
+        #freq_hist_vals=hist_vals[:]
+        #for i,val in enumerate(apidxes): freq_hist_vals[i]=val / (binwidth * sweepnum)
+        self.exp1_handles['hist_plot'].remove()
+        self.exp1_handles['hist_plot'] =self.exp1_handles['hist_ax'].bar(bin_centers,hist_vals,binwidth*.9,color='blue')
+        self.exp1_handles['hist_ax'].set_ylim(0,max(hist_vals))
+        self.exp1_handles['hist_fig_photo'] = self.draw_figure(self.exp1_handles['hist_canvas'], self.exp1_handles['hist_fig'], loc=(0, 0))
     def stimulate_once(self,value=0):
-        currenttime=0
-        self.stimulate(currenttime)
+        self.stimulate(self.exp1_handles['timenow'].get())
     
     def stimulate(self,settime=-1):
-        print('stimulus')
+        if settime==-1:
+            timenow = self.exp1_handles['timenow'].get()
+            self.exp1_handles['timenow'].set(timenow + 1)
+        else:
+            self.exp1_handles['timenow'].set(settime)
+        self.update_plots()
+        
+        if self.exp1_handles['PlayButton']['text'] == 'Pause' and settime==-1:
+            if self.exp1_handles['replayinterval_base']<.030:
+                delay = 30
+            else:
+                delay = 1
+                
+            delay = int(1000/self.exp1_handles['replayspeed'])
+            self.exp1_handles['window'].after(delay, self.stimulate)
         # ez az ami plottol és újraindítja magát . runningrat
     
     def start_stop_stimulation(self):
