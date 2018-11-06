@@ -124,13 +124,13 @@ class IBO_touchtherat_GUI():
         self.exp1_handles['replayspeed_str'].set(str(self.exp1_handles['replayspeed'])+'X')
         
         tk.Label(self.exp1_handles['window'],text = 'Neuron:').grid(row=0, column=0,sticky='E')
-        self.exp1_handles['cellselector'] = tk.OptionMenu(self.exp1_handles['window'], self.exp1_handles['cellnum'], *list(range(1, len(self.neurons)+1)), command=self.stimulate ) 
+        self.exp1_handles['cellselector'] = tk.OptionMenu(self.exp1_handles['window'], self.exp1_handles['cellnum'], *list(range(1, len(self.neurons)+1)), command=self.stimulate_once ) 
         self.exp1_handles['cellselector'].grid(row=0, column=1, sticky='W')
         
         self.exp1_handles['TimeScale'] = tk.Scale(self.exp1_handles['window'], orient = 'horizontal', length = 1000, variable = self.exp1_handles['timenow'], from_ = 1, to = 1000, command = self.stimulate_once)
         #self.exp1_handles['TimeScale'].pack()
         self.exp1_handles['TimeScale'].grid(row=8,column=1, sticky='W',columnspan = 5)
-        tk.Label(self.exp1_handles['window'],text = 'Stimulus number').grid(row=9,column=1,columnspan = 5)
+        tk.Label(self.exp1_handles['window'],text = 'Trial number').grid(row=9,column=1,columnspan = 5)
         
         self.exp1_handles['PlayButton'] = tk.Button(self.exp1_handles['window'], text ="Play", command = self.start_stop_stimulation )
         #self.exp1_handles['PlayButton'].pack()
@@ -167,7 +167,7 @@ class IBO_touchtherat_GUI():
         self.exp1_handles['dots_ax'].set_ylim(0,1000)
         self.exp1_handles['dots_ax'].set_xlabel('Time relative to touch (ms)')
         self.exp1_handles['dots_ax'].set_ylabel('Trial number')
-        self.exp1_handles['dots_plot'] = self.exp1_handles['dots_ax'].scatter(-100,-50,edgecolors='k',facecolor='r',linewidths=1,s=150,zorder = 3)
+        self.exp1_handles['dots_plot'] = self.exp1_handles['dots_ax'].scatter(-100,-50,edgecolors='k',facecolor='r',linewidths=1,s=100,zorder = 3)
         self.exp1_handles['dots_fig_photo'] = self.draw_figure(self.exp1_handles['dots_canvas'], self.exp1_handles['dots_fig'], loc=(0, 0))
         
         self.exp1_handles['hist_canvas'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['hist_w'], height=self.exp1_handles['hist_h'])
@@ -229,7 +229,7 @@ class IBO_touchtherat_GUI():
         idxes = [i for i, x in enumerate(self.neurons[cellnum]['APsweep']) if x <= sweepnum]
         aptimes = [self.neurons[cellnum]['APtime'][x]*1000 for i,x in enumerate(idxes)]
         if len(aptimes)>0:
-            hist_vals,bin_edges = np.histogram(aptimes,bins='fd')
+            hist_vals,bin_edges = np.histogram(aptimes,bins=20)
             bin_centers= (bin_edges[:-1] + bin_edges[1:]) / 2
             binwidth = (bin_edges[2] - bin_edges[1])
         else:

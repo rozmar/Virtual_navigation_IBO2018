@@ -20,11 +20,11 @@ def loadthedata():
     totaltime = sweepnum * sweeplength
     totalbintime = binsize * sweepnum
     basefiringrate_mu = 20
-    basefiringrate_sigma = 10
+    basefiringrate_sigma = 5
     excitedcellnum = 5
     excitedcell_delay_mu = .030
     excitedcell_delay_sigma = .001
-    excitedcell_firingratechange_distrtibution_sigma = .003 
+    excitedcell_firingratechange_distrtibution_sigma = .004 
     excitedcell_firingratechange_mu = 40
     excitedcell_firingratechange_sigma = 5
     inhibitedcellnum = 5
@@ -32,8 +32,10 @@ def loadthedata():
     inhibitedcell_delay_sigma = .01
     inhibitedcell_firingratechange_distrtibution_sigma = .005
     inhibitedcell_firingratechange_mu = 20
-    inhibitedcell_firingratechange_sigma = 10
+    inhibitedcell_firingratechange_sigma = 5
     bulkcellnum = 5
+    APtime_maxrandvalue = .0002 # to randomize the timing of the APs
+    
     celltypes=list()
     for celli in range(0,excitedcellnum):
         celltypes.append('excited')
@@ -68,19 +70,29 @@ def loadthedata():
             aphist,binedges=np.histogram(aptimes,binnum,(timestart,timeend))
         aphist += baseAPineachbin
         aphist[aphist<0]=0
-        #%%
         aptime = list()
         apsweep = list()
         idx = -1
         
         for timenow in np.linspace(timestart,timeend,binnum):
             idx += 1
-            sweepnums = np.random.uniform(0,sweepnum,aphist[idx]).round()
+            sweepnums = np.random.uniform(1,sweepnum,aphist[idx]).round()
             times = np.ones(aphist[idx]) * timenow
             apsweep.extend(sweepnums)
             aptime.extend(times)
-        data['APsweep'] = apsweep
-        data['APtime'] = aptime
+        aptime += np.random.uniform(-APtime_maxrandvalue, APtime_maxrandvalue, len(aptime))
+        randtime_sweep = np.random.uniform(-APtime_maxrandvalue*2, APtime_maxrandvalue*2,sweepnum)
+        for i, sw in enumerate(apsweep): 
+            aptime[i] += randtime_sweep[int(sw-1)]
+        realaptime=list()
+        realapsweep=list()
+        for i, aptime_now in enumerate(aptime):
+            if aptime_now <= timeend and aptime_now >=timestart:
+                realaptime.append(aptime_now)
+                realapsweep.append(apsweep[i])
+
+        data['APsweep'] = realapsweep
+        data['APtime'] = realaptime
         cells.append(data)
     return cells
 
