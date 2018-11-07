@@ -141,7 +141,7 @@ class IBO_mainwindow:
         canproceed = False
         if len(ID)>3:
             if isfilepresent == 1:
-                answer = simpledialog.askstring("Password needed to load the data.", "Enter password:")
+                answer = simpledialog.askstring("Password needed to load the data.", "Enter password:", show='*')
                 if answer == 'mehet':
                     canproceed = True
             else:
