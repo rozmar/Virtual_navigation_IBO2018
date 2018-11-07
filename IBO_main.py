@@ -100,8 +100,8 @@ class Neuron():
         timenow = self.__class__._timenow
         idxes = range(0,abs(self.data[runnum]['APtimes']-timenow).argmin())
 #        hist, bin_edges = np.histogram(self.data[runnum]['speed'][idxes],binnum,(0,200))
-        hist=fast_histogram.histogram1d(self.data[runnum]['speed'][idxes],binnum,(0,70))
-        bin_centers=np.arange(0,70,70/binnum)+ 70/binnum/2
+        hist=fast_histogram.histogram1d(self.data[runnum]['speed'][idxes],binnum,(0,80))
+        bin_centers=np.arange(0,80,80/binnum)+ 80/binnum/2
 #        bin_centers=np.convolve(bin_edges,[0.5,0.5],mode='valid')
         return hist, bin_centers
     
@@ -202,8 +202,8 @@ class RatTrajectory():
         timenow = self.__class__._timenow
         idxes = range(0,abs(self.data['locationtime']-timenow).argmin())
 #        hist, bin_edges = np.histogram(self.data['speed'][idxes],binnum,(0,200))
-        hist=fast_histogram.histogram1d(self.data['speed'][idxes,0],binnum,(0,70))
-        bin_centers=np.arange(0,70,70/binnum)+ 70/binnum/2
+        hist=fast_histogram.histogram1d(self.data['speed'][idxes,0],binnum,(0,80))
+        bin_centers=np.arange(0,80,80/binnum)+ 80/binnum/2
 #        bin_centers=np.convolve(bin_edges,[0.5,0.5],mode='valid')
         return hist, bin_centers
     
