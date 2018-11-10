@@ -1,0 +1,7 @@
+2018.11.09. - 10:10:48   selected cells: , , ,    answers so far: False, False, False, False,    tries left: 10   exp1 disabled: False
+2018.11.09. - 10:20:15   selected cells: , , ,    answers so far: False, False, False, False,    tries left: 10   exp1 disabled: False   event: program restarted
+2018.11.09. - 10:20:27   selected cells: 1, 2, 3,    answers so far: True, False, False, False,    tries left: 9   exp1 disabled: False   event: answer submitted
+2018.11.09. - 10:20:51   selected cells: 1, 2, 3,    answers so far: True, False, False, False,    tries left: 8   exp1 disabled: False   event: answer submitted
+2018.11.09. - 10:21:06   selected cells: 1, 2, 3,    answers so far: True, False, False, False,    tries left: 8   exp1 disabled: True   event: Experiment 1 disabled
+2018.11.09. - 10:50:18   selected cells: , , ,    answers so far: True, False, False, False,    tries left: 8   exp1 disabled: True   event: Experiment 1 disabled
+2018.11.09. - 10:50:18   selected cells: , , ,    answers so far: True, False, False, False,    tries left: 8   exp1 disabled: True   event: program restarted

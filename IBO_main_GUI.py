@@ -8,14 +8,20 @@ from tkinter import simpledialog
 import matplotlib as mpl
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+import sys
 #from multiprocessing import Process
 import time
+
+if len(sys.argv)>1:
+    ID = sys.argv[1]
+else:
+    ID = ''
 neurons, trajectories, basedir = IBO_main.loadthedata()
 
 
 #%%
 class IBO_mainwindow:
-    def __init__(self,master,neurons,trajectories,basedir):
+    def __init__(self,master,neurons,trajectories,basedir,ID = ''):
         self.master=master
         self.neurons=neurons
         self.trajectories=trajectories
@@ -63,6 +69,12 @@ class IBO_mainwindow:
         self.exp1_startbutton_2 = tk.Button(master, text = 'Start\nexperiment\nagain!',command = self.startexperiment_2, state='disabled')
         self.exp1_startbutton_2.grid(row=10,column=0,columnspan=8)
         self.exp1_disabled = False
+        if len(ID)>1:
+            self.ID.set(ID)
+            self.preloadedID = True
+            self.checkID()
+        else:
+            self.preloadedID = False
     def validate_answer(self, P):
         if (str.isdigit(P) and float(P)<=len(self.neurons) and float(P)>0) or P == "":
             return True
@@ -76,10 +88,12 @@ class IBO_mainwindow:
         cellnums.append(self.answer_3.get())
         if cellnums[0].isdigit and cellnums[1].isdigit and cellnums[2].isdigit and cellnums.count(cellnums[0])==1 and cellnums.count(cellnums[1]) == 1 and cellnums.count(cellnums[2]) == 1:
             celltypes = list()
+            isspeedcell =list()
             for num in cellnums:
                 celltypes.append(neurons[int(num)-1].data[neurons[int(num)-1].runnum]['celltype'])
-            if celltypes.count(celltypes[0]) == len(celltypes) and celltypes[0] != 'bulk':
-                if celltypes[0] == 'speed':
+                isspeedcell.append(neurons[int(num)-1].data[neurons[int(num)-1].runnum]['itsaspeedcell'])
+            if (celltypes.count(celltypes[0]) == len(celltypes) and celltypes[0] != 'bulk') or isspeedcell.count(1) == len(celltypes): 
+                if celltypes[0] == 'speed' or isspeedcell.count(1) == len(celltypes):
                     if self.answer_cellgroups[0] == True:
                         messagebox.showinfo("Hey!", "You have found the speed modulated neurons... again.. look for something else!")
                     else:
@@ -111,7 +125,7 @@ class IBO_mainwindow:
             self.update_answer_counter()
             if self.unusedanswers.get()<1 or self.answer_cellgroups.count(True) == 4:
                 self.disable_exp1()
-            self.updatelog()
+            self.updatelog('answer submitted')
                     
     def skip_exp1(self):
         answer = messagebox.askyesno('!!WARNING!!','Are you sure? Do you really want to skip this task? You will lose your remaining chances and there is no way back!')
@@ -131,7 +145,7 @@ class IBO_mainwindow:
         self.cellgroup_label_4.config(state='disabled')
         self.skip_exp_1_button.config(state='disabled')
         self.exp1_startbutton_2.config(state='normal')
-        self.updatelog()
+        self.updatelog('Experiment 1 disabled')
     def checkID(self):
         
         logfiles=os.listdir(self.logdir)
@@ -140,7 +154,7 @@ class IBO_mainwindow:
         isfilepresent = logfiles.count(ID + '.json')
         canproceed = False
         if len(ID)>3:
-            if isfilepresent == 1:
+            if isfilepresent == 1 and not self.preloadedID:
                 answer = simpledialog.askstring("Password needed to load the data.", "Enter password:", show='*')
                 if answer == 'mehet':
                     canproceed = True
@@ -177,10 +191,10 @@ class IBO_mainwindow:
                 self.update_answer_counter()
                 if self.exp1_disabled == True:
                     self.disable_exp1()
+                self.updatelog('program restarted')
             else:
-                self.updatelog()
-                #generating json file
-    def updatelog(self):
+                self.updatelog('program started')
+    def updatelog(self,message = ''):
         ID=self.ID.get().lower()
         datatostore = dict()
         datatostore['unusedanswers'] = self.unusedanswers.get()
@@ -204,8 +218,8 @@ class IBO_mainwindow:
             file_object.write('   selected cells: ' + cellnums_str)
             file_object.write('   answers so far: ' + answer_str)
             file_object.write('   tries left: ' + str(self.unusedanswers.get()))
-            file_object.write('   exp1 disabled: ' + str(self.exp1_disabled) + '\n')
-            
+            file_object.write('   exp1 disabled: ' + str(self.exp1_disabled))
+            file_object.write('   event: ' + message + '\n')
         
     def startexperiment(self):
         neurons[0].smalldots = 60
@@ -572,5 +586,5 @@ class IBO_runnungrat_GUI():
 
 root = tk.Tk()
 root.title('Virtual navigation')
-app = IBO_mainwindow(root,neurons, trajectories, basedir)
+app = IBO_mainwindow(root,neurons, trajectories, basedir,ID)
 root.mainloop()
