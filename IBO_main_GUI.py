@@ -9,6 +9,8 @@ import matplotlib as mpl
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 import sys
+import string
+import random
 #from multiprocessing import Process
 import time
 
@@ -64,7 +66,7 @@ class IBO_mainwindow:
         self.cellgroup_label_3.grid(row=7, column=0,columnspan=8)
         self.cellgroup_label_4 = tk.Label(master, text = 'Group 4 - ???', state = 'disabled')
         self.cellgroup_label_4.grid(row=8, column=0,columnspan=8)
-        self.skip_exp_1_button = tk.Button(master, text = 'Skip this part!',bg = "red", command = self.skip_exp1, state = 'disabled')
+        self.skip_exp_1_button = tk.Button(master, text = 'Skip this part!\nShow the CODE!',bg = "red", command = self.skip_exp1, state = 'disabled')
         self.skip_exp_1_button.grid(row=9, column=0,columnspan=8)
         self.exp1_startbutton_2 = tk.Button(master, text = 'Start\nexperiment\nagain!',command = self.startexperiment_2, state='disabled')
         self.exp1_startbutton_2.grid(row=10,column=0,columnspan=8)
@@ -128,10 +130,15 @@ class IBO_mainwindow:
             self.updatelog('answer submitted')
                     
     def skip_exp1(self):
-        answer = messagebox.askyesno('!!WARNING!!','Are you sure? Do you really want to skip this task? You will lose your remaining chances and there is no way back!')
-        if answer:
-            self.disable_exp1()
+        if self.exp1_disabled:
+            messagebox.showinfo("Write it in the answer sheet!", "Your code is:\n"+ self.code)
+        else:
+            answer = messagebox.askyesno('!!WARNING!!','Are you sure? Do you really want to skip this task? You will lose your remaining chances and there is no way back!')
+            if answer:
+                self.disable_exp1()
     def disable_exp1(self):   
+        
+
         self.exp1_disabled = True
         self.exp1_startbutton.config(state='disabled')
         self.answer_1_entry.config(state='disabled')
@@ -143,9 +150,37 @@ class IBO_mainwindow:
         self.cellgroup_label_2.config(state='disabled')
         self.cellgroup_label_3.config(state='disabled')
         self.cellgroup_label_4.config(state='disabled')
-        self.skip_exp_1_button.config(state='disabled')
+#        self.skip_exp_1_button.config(state='disabled')
         self.exp1_startbutton_2.config(state='normal')
         self.updatelog('Experiment 1 disabled')
+        self.calculatecode_exp1()
+        self.skip_exp_1_button.config(text='CODE:\n'+self.code,bg = "#40E0D0")
+                                      
+    def calculatecode_exp1(self):
+        pointpercelltype = 8
+        basepoint = self.answer_cellgroups.count(True) * pointpercelltype
+        multipliertable = dict()
+        multipliertable[0] = .7
+        multipliertable[1] = .75
+        multipliertable[2] = .8
+        multipliertable[3] = .85
+        multipliertable[4] = .9
+        multipliertable[5] = .95
+        multipliertable[6] = 1
+        multipliertable[7] = 1
+        multipliertable[8] = 1
+        multipliertable[9] = 1
+        multipliertable[10] = 1
+        multiplier = multipliertable[self.unusedanswers.get()]
+        self.point = basepoint * multiplier
+        rnd1 = ''.join(random.choice(string.ascii_uppercase) for _ in range(3))
+        rnd2 = ''.join(random.choice(string.ascii_uppercase) for _ in range(3))
+        pointstr = str(round(self.point*100))
+        if len(pointstr) == 1:
+            pointstr += '00'
+        elif len(pointstr)==2:
+            pointstr += '0'
+        self.code=rnd1 + pointstr + rnd2
     def checkID(self):
         
         logfiles=os.listdir(self.logdir)
