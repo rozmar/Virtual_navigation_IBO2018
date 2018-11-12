@@ -11,13 +11,16 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 import sys
 import string
 import random
-#from multiprocessing import Process
 import time
+from tendo import singleton
+
+me = singleton.SingleInstance()
 
 if len(sys.argv)>1:
     ID = sys.argv[1]
 else:
     ID = ''
+    
 neurons, trajectories, basedir = IBO_main.loadthedata()
 
 
@@ -25,8 +28,12 @@ neurons, trajectories, basedir = IBO_main.loadthedata()
 class IBO_mainwindow:
     def __init__(self,master,neurons,trajectories,basedir,ID = ''):
         self.master=master
+        self.code = ''
+        self.points = 0
         self.neurons=neurons
         self.trajectories=trajectories
+        self.neurons[0].smalldots = 60
+        self.trajectories[0].timeback = 60
         self.basedir=basedir
         self.logdir=basedir + '/Logs/'
         self.ID = tk.StringVar()
@@ -35,41 +42,40 @@ class IBO_mainwindow:
         self.answer_2 = tk.StringVar()
         self.answer_3 = tk.StringVar()
         self.IDlabel = tk.Label(master,text = 'ID:')
-        self.IDlabel.grid(row=0, column=0,sticky = 'E')
+        self.IDlabel.grid(row=0, column=1,sticky = 'E')
         self.IDentry = tk.Entry(master,textvariable = self.ID,width = 10)
-        self.IDentry.grid(row=0, column=1,columnspan=3)
+        self.IDentry.grid(row=0, column=2,columnspan=3)
         self.IDsubmit = tk.Button(master,text = 'Submit \nID!',command=self.checkID)
-        self.IDsubmit.grid(row=0,column=7)
+        self.IDsubmit.grid(row=0,column=8)
         
-        self.exp1_startbutton = tk.Button(master, text = 'Start \nexperiment!',command = self.startexperiment, state='disabled')
-        self.exp1_startbutton.grid(row=1,column=0)
         answerentrywidth=2
         vcmd = (master.register(self.validate_answer))
         self.answer_1_entry = tk.Entry(master,textvariable = self.answer_1, width = answerentrywidth, state='disabled', validate='all', validatecommand=(vcmd, '%P'))
-        self.answer_1_entry.grid(row=1, column=1)
+        self.answer_1_entry.grid(row=1, column=2)
         self.answer_2_entry = tk.Entry(master,textvariable = self.answer_2, width = answerentrywidth, state='disabled', validate='all', validatecommand=(vcmd, '%P'))
-        self.answer_2_entry.grid(row=1, column=2)
+        self.answer_2_entry.grid(row=1, column=3)
         self.answer_3_entry = tk.Entry(master,textvariable = self.answer_3, width = answerentrywidth, state='disabled', validate='all', validatecommand=(vcmd, '%P'))
-        self.answer_3_entry.grid(row=1, column=3)
+        self.answer_3_entry.grid(row=1, column=4)
         self.answer_submit = tk.Button(master, text = 'Submit \nanswer!', command = self.submit_answer, state = 'disabled')
-        self.answer_submit.grid(row=1, column=7)
+        self.answer_submit.grid(row=1, column=8)
         self.unusedanswers=tk.IntVar()
         self.unusedanswers.set(10)
         self.unusedanswercounter = tk.Label(master, text = '', state = 'disabled')
-        self.unusedanswercounter.grid(row=4, column=1,columnspan=3)
+        self.unusedanswercounter.grid(row=4, column=2,columnspan=8)
         self.update_answer_counter()
         self.cellgroup_label_1 = tk.Label(master, text = 'Group 1 - ???', state = 'disabled')
-        self.cellgroup_label_1.grid(row=5, column=0,columnspan=8)
+        self.cellgroup_label_1.grid(row=5, column=1,columnspan=8)
         self.cellgroup_label_2 = tk.Label(master, text = 'Group 2 - ???', state = 'disabled')
-        self.cellgroup_label_2.grid(row=6, column=0,columnspan=8)
+        self.cellgroup_label_2.grid(row=6, column=1,columnspan=8)
         self.cellgroup_label_3 = tk.Label(master, text = 'Group 3 - ???', state = 'disabled')
-        self.cellgroup_label_3.grid(row=7, column=0,columnspan=8)
+        self.cellgroup_label_3.grid(row=7, column=1,columnspan=8)
         self.cellgroup_label_4 = tk.Label(master, text = 'Group 4 - ???', state = 'disabled')
-        self.cellgroup_label_4.grid(row=8, column=0,columnspan=8)
+        self.cellgroup_label_4.grid(row=8, column=1,columnspan=8)
         self.skip_exp_1_button = tk.Button(master, text = 'Skip this part!\nShow the CODE!',bg = "red", command = self.skip_exp1, state = 'disabled')
-        self.skip_exp_1_button.grid(row=9, column=0,columnspan=8)
-        self.exp1_startbutton_2 = tk.Button(master, text = 'Start\nexperiment\nagain!',command = self.startexperiment_2, state='disabled')
-        self.exp1_startbutton_2.grid(row=10,column=0,columnspan=8)
+        self.skip_exp_1_button.grid(row=9, column=1,columnspan=8)
+        self.exp1_container=tk.Frame(master)
+        self.exp1_container.grid(row=0,column=0,rowspan=100)
+        
         self.exp1_disabled = False
         if len(ID)>1:
             self.ID.set(ID)
@@ -77,6 +83,7 @@ class IBO_mainwindow:
             self.checkID()
         else:
             self.preloadedID = False
+        self.app = IBO_runnungrat_GUI(self.exp1_container,self.neurons,self.trajectories,False)
     def validate_answer(self, P):
         if (str.isdigit(P) and float(P)<=len(self.neurons) and float(P)>0) or P == "":
             return True
@@ -97,32 +104,32 @@ class IBO_mainwindow:
             if (celltypes.count(celltypes[0]) == len(celltypes) and celltypes[0] != 'bulk') or isspeedcell.count(1) == len(celltypes): 
                 if celltypes[0] == 'speed' or isspeedcell.count(1) == len(celltypes):
                     if self.answer_cellgroups[0] == True:
-                        messagebox.showinfo("Hey!", "You have found the speed modulated neurons... again.. look for something else!")
+                        messagebox.showinfo("Hey!", "You have found the group 1 neurons... again.. look for something else!")
                     else:
                         self.answer_cellgroups[0] = True
-                        self.cellgroup_label_1.config(text = 'Group 1 - speed modulated cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the speed modulated neurons!")
+                        self.cellgroup_label_1.config(text = 'Group 1 - You have found this group!' )
+                        messagebox.showinfo("Congratulations!", "You have found the group 1 neurons!")
                 elif celltypes[0] == 'HD':
                     if self.answer_cellgroups[1] == True:
-                        messagebox.showinfo("Hey!", "You have found the head direction cells... again.. look for something else!")
+                        messagebox.showinfo("Hey!", "You have found the group 2 cells... again.. look for something else!")
                     else:
                         self.answer_cellgroups[1] = True
-                        self.cellgroup_label_2.config(text = 'Group 2 - head direction cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the head direction cells!")
+                        self.cellgroup_label_2.config(text = 'Group 2 - You have found this group!' )
+                        messagebox.showinfo("Congratulations!", "You have found the group 2 cells!")
                 elif celltypes[0] == 'border':
                     if self.answer_cellgroups[2] == True:
-                        messagebox.showinfo("Hey!", "You have found the border cells... again.. look for something else!")
+                        messagebox.showinfo("Hey!", "You have found the group 3 cells ... again.. look for something else!")
                     else:
                         self.answer_cellgroups[2] = True
-                        self.cellgroup_label_3.config(text = 'Group 3 - border cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the border cells!")
+                        self.cellgroup_label_3.config(text = 'Group 3 - You have found this group!' )
+                        messagebox.showinfo("Congratulations!", "You have found the group 3 cells!")
                 elif celltypes[0] == 'grid':
                     if self.answer_cellgroups[3] == True:
-                        messagebox.showinfo("Hey!", "You have found the grid cells... again.. look for something else!")
+                        messagebox.showinfo("Hey!", "You have found the group 4 cells... again.. look for something else!")
                     else:
                         self.answer_cellgroups[3] = True
-                        self.cellgroup_label_4.config(text = 'Group 4 - grid cells' )
-                        messagebox.showinfo("Congratulations!", "You have found the grid cells!")
+                        self.cellgroup_label_4.config(text = 'Group 4 - You have found this group!' )
+                        messagebox.showinfo("Congratulations!", "You have found the group 4 cells!")
             self.unusedanswers.set(self.unusedanswers.get()-1)
             self.update_answer_counter()
             if self.unusedanswers.get()<1 or self.answer_cellgroups.count(True) == 4:
@@ -140,7 +147,6 @@ class IBO_mainwindow:
         
 
         self.exp1_disabled = True
-        self.exp1_startbutton.config(state='disabled')
         self.answer_1_entry.config(state='disabled')
         self.answer_2_entry.config(state='disabled')
         self.answer_3_entry.config(state='disabled')
@@ -150,11 +156,12 @@ class IBO_mainwindow:
         self.cellgroup_label_2.config(state='disabled')
         self.cellgroup_label_3.config(state='disabled')
         self.cellgroup_label_4.config(state='disabled')
-#        self.skip_exp_1_button.config(state='disabled')
-        self.exp1_startbutton_2.config(state='normal')
         self.updatelog('Experiment 1 disabled')
-        self.calculatecode_exp1()
+        if self.code == '':
+            self.calculatecode_exp1()
         self.skip_exp_1_button.config(text='CODE:\n'+self.code,bg = "#40E0D0")
+        self.neurons[0].smalldots = np.inf
+        self.trajectories[0].timeback = np.inf
                                       
     def calculatecode_exp1(self):
         pointpercelltype = 8
@@ -181,8 +188,8 @@ class IBO_mainwindow:
         elif len(pointstr)==2:
             pointstr += '0'
         self.code=rnd1 + pointstr + rnd2
-    def checkID(self):
         
+    def checkID(self):
         logfiles=os.listdir(self.logdir)
         ID=self.ID.get().lower()
         self.ID.set(ID)
@@ -198,7 +205,6 @@ class IBO_mainwindow:
         if canproceed:
             self.IDentry.config(state='disabled')
             self.IDsubmit.config(state='disabled')
-            self.exp1_startbutton.config(state='normal')
             self.answer_1_entry.config(state='normal')
             self.answer_2_entry.config(state='normal')
             self.answer_3_entry.config(state='normal')
@@ -215,20 +221,23 @@ class IBO_mainwindow:
                 self.ID.set(storeddata['ID'])
                 self.answer_cellgroups = storeddata['answer_cellgroups']
                 self.exp1_disabled = storeddata['exp1_disabled']
+                self.code = storeddata['code']
+                self.points = storeddata['points']
                 if self.answer_cellgroups[0] == True:
-                    self.cellgroup_label_1.config(text = 'Group 1 - speed modulated cells' )
+                    self.cellgroup_label_1.config(text = 'Group 1 - You have found this group!' )
                 if self.answer_cellgroups[1] == True:
-                    self.cellgroup_label_1.config(text = 'Group 2 - head direction cells' )
+                    self.cellgroup_label_1.config(text = 'Group 2 - You have found this group!' )
                 if self.answer_cellgroups[2] == True:
-                    self.cellgroup_label_1.config(text = 'Group 3 - border cells' )
+                    self.cellgroup_label_1.config(text = 'Group 3 - You have found this group!' )
                 if self.answer_cellgroups[3] == True:
-                    self.cellgroup_label_1.config(text = 'Group 4 - grid cells' )
+                    self.cellgroup_label_1.config(text = 'Group 4 - You have found this group!' )
                 self.update_answer_counter()
                 if self.exp1_disabled == True:
                     self.disable_exp1()
                 self.updatelog('program restarted')
             else:
                 self.updatelog('program started')
+                
     def updatelog(self,message = ''):
         ID=self.ID.get().lower()
         datatostore = dict()
@@ -236,6 +245,8 @@ class IBO_mainwindow:
         datatostore['ID'] = ID
         datatostore['answer_cellgroups'] = self.answer_cellgroups
         datatostore['exp1_disabled'] = self.exp1_disabled
+        datatostore['points'] = self.points
+        datatostore['code'] = self.code
         with open(self.logdir + ID + '.json', 'w') as f_obj: json.dump(datatostore, f_obj)
         
         cellnums=list()
@@ -255,18 +266,6 @@ class IBO_mainwindow:
             file_object.write('   tries left: ' + str(self.unusedanswers.get()))
             file_object.write('   exp1 disabled: ' + str(self.exp1_disabled))
             file_object.write('   event: ' + message + '\n')
-        
-    def startexperiment(self):
-        neurons[0].smalldots = 60
-        trajectories[0].timeback = 60
-        self.newWindow = tk.Toplevel(self.master)
-        self.app = IBO_runnungrat_GUI(self.newWindow,self.neurons,self.trajectories,False)
-    
-    def startexperiment_2(self):
-        neurons[0].smalldots = np.inf
-        trajectories[0].timeback = np.inf
-        self.newWindow = tk.Toplevel(self.master)
-        self.app = IBO_runnungrat_GUI(self.newWindow,self.neurons,self.trajectories,True)
     
     def update_answer_counter(self):
         self.unusedanswercounter.config(text = 'You have\n' + str(self.unusedanswers.get()) + '\ntries left.')
@@ -290,7 +289,7 @@ class IBO_runnungrat_GUI():
         
         
         self.exp1_handles['window'] = master
-        self.exp1_handles['window'].title("Experiment 1")
+#        self.exp1_handles['window'].title("Experiment 1")
         
         self.exp1_handles['timenow'] = tk.DoubleVar()
         self.exp1_handles['timenow'].set(0)
@@ -302,7 +301,7 @@ class IBO_runnungrat_GUI():
         self.exp1_handles['runnum'].set(1)
         
         self.exp1_handles['onlinehist'] = tk.BooleanVar()
-        self.exp1_handles['onlinehist'].set(False)
+        self.exp1_handles['onlinehist'].set(True)
         
         self.exp1_handles['replayspeed'] = 1 
         self.exp1_handles['replayinterval_base'] = 0.05

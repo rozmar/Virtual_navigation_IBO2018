@@ -284,6 +284,11 @@ def loadthedata():
         for fieldname in rattrajectory.keys():
             data[fieldname]=rattrajectory[fieldname][idx]
         trajectories.append(RatTrajectory(data))
-        
-    
     return neurons, trajectories, basedir
+
+
+def printneurontypes(neurons):
+    for i,neuron in enumerate(neurons):
+        celltype = neuron.data[0]['celltype']
+        isspeedcell = neuron.data[0]['itsaspeedcell']
+        print(str(i) + ' - ' + celltype, ' - is it a speed cell:', isspeedcell)

@@ -78,3 +78,4 @@ for competitor in competitors:
 
 for competitor in competitors:
     print(competitor.name  + '  ' + str(competitor.point()))
+    
