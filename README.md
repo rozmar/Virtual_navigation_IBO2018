@@ -6,7 +6,7 @@ os, scipy, numpy, fast_histogram, json , tkinter, matplotlib, sys , string , ran
 Contents:
 ---------
 IBO_pre_GUI.py
-Runs the somatosensory experiment. This is not logged. Multiple instances can be run. Easy. For showcasing purpouses.
+Runs the somatosensory experiment. This is not logged. Multiple instances can be run. Easy. For showcasing purposes.
 
 IBO_main_GUI.py 'username'    (quotes are not needed, username is specified by the user. e.g. competitor1)
 Runs the main single window GUI for the competition. Only one instance can run at the same time (tendo package).
