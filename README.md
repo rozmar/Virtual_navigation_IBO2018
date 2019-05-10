@@ -15,4 +15,5 @@ First, it loads the cell firing and animal trajectory data from the Data/experim
 Creates log files in the Log directory for each user:
 
 -username.log contains the actions of the user (starting the program, adding an answer). This can be useful to track the steps of the competitor if something funny happens.
+
 -username.json contains the current state of the practical: number of remaining tries, good answers, generated code. This log file is instrumental to continue the experiment if the competitor accidentally quits from the program.
