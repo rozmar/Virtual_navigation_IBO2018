@@ -8,7 +8,7 @@ Contents:
 IBO_pre_GUI.py
 Runs the somatosensory experiment. This is not logged. Multiple instances can be run. Easy. For showcasing purposes.
 
-IBO_main_GUI.py 'username'    (quotes are not needed, username is specified by the user. e.g. competitor1)
+IBO_main_GUI.py 'username'    (quotes are not needed, username is specified by the user. e.g. "python IBO_main_GUI.py competitor1")
 Runs the main single window GUI for the competition. Only one instance can run at the same time (tendo package).
 First, it loads the cell firing and animal trajectory data from the Data/experiment1.mat.
 Creates log files in the Log directory for each user:
