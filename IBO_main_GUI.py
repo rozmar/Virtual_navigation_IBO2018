@@ -5,16 +5,17 @@ import numpy as np
 import tkinter as tk
 import tkinter.messagebox as messagebox
 from tkinter import simpledialog
-import matplotlib as mpl
+#import matplotlib as mpl
+import matplotlib.pyplot as plt
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 import sys
 import string
 import random
 import time
-from tendo import singleton
+from tendo import singleton # only one copy of the program should run at the same time
 
-me = singleton.SingleInstance()
+me = singleton.SingleInstance() #if there is another copy of the program is runnung, it exits from the second instance
 
 if len(sys.argv)>1:
     ID = sys.argv[1]
@@ -352,7 +353,7 @@ class IBO_runnungrat_GUI():
         
         self.exp1_handles['canvas1'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['w'], height=self.exp1_handles['h'])
         self.exp1_handles['canvas1'].grid(row=2, column=1,columnspan=5,rowspan=3)
-        self.exp1_handles['fig1'] = mpl.figure.Figure(figsize=figsize_big,dpi=dpi_big)
+        self.exp1_handles['fig1'] = plt.Figure(figsize=figsize_big,dpi=dpi_big)
         self.exp1_handles['ax1'] = self.exp1_handles['fig1'].add_axes(rect_big)
         self.exp1_handles['ax1'].set_xlim(0,200)
         self.exp1_handles['ax1'].set_ylim(0,200)
@@ -369,7 +370,7 @@ class IBO_runnungrat_GUI():
         
         self.exp1_handles['canvas2'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['w_small'], height=self.exp1_handles['h_small'])
         self.exp1_handles['canvas2'].grid(row=1, column=7,rowspan=2,columnspan=2)
-        self.exp1_handles['fig2'] = mpl.figure.Figure(figsize=smallfigsize,dpi=smalldpi)
+        self.exp1_handles['fig2'] = plt.Figure(figsize=smallfigsize,dpi=smalldpi)
         self.exp1_handles['ax2'] = self.exp1_handles['fig2'].add_axes(smallrect)
         self.exp1_handles['ax2'].set_xlim(0,200)
         self.exp1_handles['ax2'].set_ylim(0,200)
@@ -382,7 +383,7 @@ class IBO_runnungrat_GUI():
         
         self.exp1_handles['canvas3'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['w_small'], height=self.exp1_handles['h_small'])
         self.exp1_handles['canvas3'].grid(row=3, column=7,rowspan=1,columnspan=2,sticky='N')
-        self.exp1_handles['fig3'] = mpl.figure.Figure(figsize=smallfigsize,dpi=smalldpi)
+        self.exp1_handles['fig3'] = plt.Figure(figsize=smallfigsize,dpi=smalldpi)
         self.exp1_handles['ax3'] = self.exp1_handles['fig3'].add_axes(smallrect)
         self.exp1_handles['ax3'].set_xlim(0,200)
         self.exp1_handles['ax3'].set_ylim(0,200)
@@ -395,7 +396,7 @@ class IBO_runnungrat_GUI():
         
         self.exp1_handles['canvas4'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['w_small'], height=self.exp1_handles['h_small'])
         self.exp1_handles['canvas4'].grid(row=4, column=7,rowspan=1,columnspan=2,sticky='N')
-        self.exp1_handles['fig4'] = mpl.figure.Figure(figsize=smallfigsize,dpi=smalldpi)
+        self.exp1_handles['fig4'] = plt.Figure(figsize=smallfigsize,dpi=smalldpi)
         self.exp1_handles['ax4'] = self.exp1_handles['fig4'].add_axes(smallrect)
         self.exp1_handles['ax4'].set_xlim(0,80)
         self.exp1_handles['ax4'].set_ylim(0,80)
@@ -408,7 +409,7 @@ class IBO_runnungrat_GUI():
         
         self.exp1_handles['canvas5'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['w_small'], height=self.exp1_handles['h_small'])
         self.exp1_handles['canvas5'].grid(row=5, column=7,rowspan=6,columnspan=2,sticky='N')
-        self.exp1_handles['fig5'] = mpl.figure.Figure(figsize=smallfigsize,dpi=smalldpi)
+        self.exp1_handles['fig5'] = plt.Figure(figsize=smallfigsize,dpi=smalldpi)
         self.exp1_handles['ax5'] = self.exp1_handles['fig5'].add_axes(smallrect, projection = 'polar')
         self.exp1_handles['ax5'].set_theta_zero_location("W")
         self.exp1_handles['ax5'].set_rmin(0)

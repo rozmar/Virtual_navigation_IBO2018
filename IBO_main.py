@@ -291,4 +291,4 @@ def printneurontypes(neurons):
     for i,neuron in enumerate(neurons):
         celltype = neuron.data[0]['celltype']
         isspeedcell = neuron.data[0]['itsaspeedcell']
-        print(str(i) + ' - ' + celltype, ' - is it a speed cell:', isspeedcell)
+        print(str(i+1) + ' - ' + celltype, ' - is it a speed cell:', isspeedcell)

@@ -1,7 +1,8 @@
 import numpy as np
 import tkinter as tk
 import tkinter.messagebox as messagebox
-import matplotlib as mpl
+#import matplotlib as mpl
+import matplotlib.pyplot as plt
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 import IBO_pre
@@ -149,7 +150,7 @@ class IBO_touchtherat_GUI():
         
         self.exp1_handles['trace_canvas'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['trace_w'], height=self.exp1_handles['trace_h'])
         self.exp1_handles['trace_canvas'].grid(row=2, column=1,columnspan=5,rowspan=1)
-        self.exp1_handles['trace_fig'] = mpl.figure.Figure(figsize=figsize_trace,dpi=dpi)
+        self.exp1_handles['trace_fig'] = plt.Figure(figsize=figsize_trace,dpi=dpi)
         self.exp1_handles['trace_ax'] = self.exp1_handles['trace_fig'].add_axes(rect_trace)
         self.exp1_handles['trace_ax'].set_xlim(self.sweepstart,self.sweepend)
         self.exp1_handles['trace_ax'].set_ylim(-1,5)
@@ -161,7 +162,7 @@ class IBO_touchtherat_GUI():
         
         self.exp1_handles['dots_canvas'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['dots_w'], height=self.exp1_handles['dots_h'])
         self.exp1_handles['dots_canvas'].grid(row=3, column=1,columnspan=5,rowspan=1)
-        self.exp1_handles['dots_fig'] = mpl.figure.Figure(figsize=figsize_dots,dpi=dpi)
+        self.exp1_handles['dots_fig'] = plt.Figure(figsize=figsize_dots,dpi=dpi)
         self.exp1_handles['dots_ax'] = self.exp1_handles['dots_fig'].add_axes(rect_dots)
         self.exp1_handles['dots_ax'].set_xlim(self.sweepstart,self.sweepend)
         self.exp1_handles['dots_ax'].set_ylim(0,1000)
@@ -172,7 +173,7 @@ class IBO_touchtherat_GUI():
         
         self.exp1_handles['hist_canvas'] = tk.Canvas(self.exp1_handles['window'], width=self.exp1_handles['hist_w'], height=self.exp1_handles['hist_h'])
         self.exp1_handles['hist_canvas'].grid(row=4, column=1,columnspan=5,rowspan=1)
-        self.exp1_handles['hist_fig'] = mpl.figure.Figure(figsize=figsize_hist,dpi=dpi)
+        self.exp1_handles['hist_fig'] = plt.Figure(figsize=figsize_hist,dpi=dpi)
         self.exp1_handles['hist_ax'] = self.exp1_handles['hist_fig'].add_axes(rect_hist)
         self.exp1_handles['hist_ax'].set_xlim(self.sweepstart,self.sweepend)
         self.exp1_handles['hist_ax'].set_ylim(0,100)
