@@ -10,7 +10,8 @@ Runs the somatosensory experiment. This is not logged. Multiple instances can be
 
 IBO_main_GUI.py 'username'    (quotes are not needed, username is specified by the user. e.g. "python IBO_main_GUI.py competitor1")
 Runs the main single window GUI for the competition. Only one instance can run at the same time (tendo package).
-First, it loads the cell firing and animal trajectory data from the Data/experiment1.mat. Changing this file changes the order of the answers.
+
+This script loads the cell firing and animal trajectory data from the Data/experiment1.mat (this takes several seconds). Changing this file changes the order of the answers. Alternative datafiles can be found on the following link: https://drive.google.com/open?id=1XFForNUu6tOo5efuJKB-eoEkff57j9Tq
 
 Creates log files in the Log directory for each user:
 
