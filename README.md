@@ -1,5 +1,7 @@
 # Virtual_navigation_IBO2018
 ----------------------------
+This script was the neurophysiology practical part of the International Biology Olympiad in Hungary, Szeged, 2019
+----------------------------
 dependencies:
 os, scipy, numpy, fast_histogram, json , tkinter, matplotlib, sys , string , random , time , tendo
 
